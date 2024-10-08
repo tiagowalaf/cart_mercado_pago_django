@@ -1,0 +1,40 @@
+{% extends 'home.html' %}
+{% block title %}Detalhes{% endblock title %}
+
+{% block content %}
+        <p>
+            Nome do Produto: {{ produto_detalhe.nome_produto }} <br>
+            Preço: {{ produto_detalhe.preco_produto }}
+        </p>
+        <button type="button" value="{{produto_detalhe.id}}" id="id-botao-add">ADD</button>
+
+        <select id="quantidade_desejada">
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+        </select>
+    <script>
+        $(document).on('click', '#id-botao-add', function(e){
+            e.preventDefault();
+            $.ajax({
+                type: 'POST',
+                url: "{% url 'adicionar_cart' %}",
+                data: {
+                    produto_id: $('#id-botao-add').val(),
+                    quantidade_desejada: $('#quantidade_desejada option:selected').text(),
+                    csrfmiddlewaretoken: '{{ csrf_token }}',
+                    action: 'post',
+                },
+                success: function(json){
+                    document.getElementById("carrinho_sumario").textContent = json.qty
+                },
+                error: function(xhr, errmsg, err){}
+            });
+        })
+    </script>
+
+{% endblock content %}
+
+# Aqui na parte de detalhes, vamos criar um botão para adicionar ao carrinho.
+# Veja que na eu uso a chave 'produto_detalhe.id' para setar o ID do produto que vou enviar.
+# Já o ID do botão é para usar no Jquery.

@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <title>{% block title %}Produtos{% endblock title %}</title>
+</head>
+<body>
+    Carrinho: <h3 id='carrinho_sumario'>{{carrinho_pro|length}}</h3>
+    {% comment %} A chave carrinho_pro é a chave que retornamos no CONTEXT PROCESSOR. {% endcomment %}
+
+    {% for lista_produtos in produtos %}
+            <p>
+                {{ lista_produtos.nome_produto }}
+                {{ lista_produtos.preco_produto }}
+            </p>
+            <a href="{% url "detalhes" lista_produtos.id %}">Detalhes</a>
+        </form>
+    {% endfor %}
+    {% block content %} {% endblock content %}
+    
+</body>
+</html>

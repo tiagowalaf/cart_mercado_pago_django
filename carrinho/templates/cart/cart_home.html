@@ -1,0 +1,81 @@
+{% extends "home.html" %}
+
+{% block title %}Carrinho{% endblock title %}
+
+{% block content %}
+    {% for prod in obter_produtos %}
+        <p> 
+        {{prod}} R${{prod.preco_produto}}
+            <select id="select{{prod.id}}">
+                {% for id, valor in qty_desejada.items %}
+                    {% if id == prod.id|slugify %}
+                        <option selected>{{valor}}</option>
+                    {% endif %}
+                {% endfor %}
+                <option value="1">1</option>
+                <option value="2">2</option>
+            </select>
+        </p>
+        <button type="button" class="update_btn" data-index="{{prod.id}}">update</button>
+        <button type="button" class="delete_btn" data-index="{{prod.id}}">Delete</button>
+        {%empty%}
+            Nada aqui
+    {% endfor %}
+    <p>TOTAL : R${{total}}</p>
+
+    <form action="{% url 'criar_pagamento' %}" method="post">
+        {%csrf_token%}
+        <button type="submit">Comprar</button>
+    </form>
+
+    <script>
+        // Atualizar quantidade do carrinho
+        $(document).on('click', '.update_btn', function(e){
+            e.preventDefault();
+            let produtoid = $(this).data('index');
+            let quantidade = $('#select' + produtoid + ' option:selected').val();
+            $.ajax({
+                type: 'POST',
+                url: "{% url 'update_cart' %}",
+                data: {
+                    produto_id: produtoid,
+                    quantidade_desejada: quantidade,
+                    csrfmiddlewaretoken: '{{ csrf_token }}',
+                    action: 'post',
+                },
+                success: function(json){
+                    location.reload();
+                },
+                error: function(xhr, errmsg, err){
+                    console.log(xhr.status + ": " + xhr.responseText);
+                }
+            });
+        });
+
+        // Deletar item do carrinho
+        $(document).on('click', '.delete_btn', function(e){
+            e.preventDefault();
+            let produtoid = $(this).data('index');
+            $.ajax({
+                type: 'POST',
+                url: "{% url 'deletar_cart' %}",
+                data: {
+                    produto_id: produtoid,
+                    csrfmiddlewaretoken: '{{ csrf_token }}',
+                    action: 'post',
+                },
+                success: function(json){
+                    location.reload();
+                },
+                error: function(xhr, errmsg, err){
+                    console.log(xhr.status + ": " + xhr.responseText);
+                }
+            });
+        });
+    </script>
+
+{% endblock content %}
+
+<!-- Usamos o id do produto no botão de "update", porque na página do carrinho,
+  irá conter vários produtos adicionados, então temos que identificar o produto que,
+  estamos pedindo o update. -->
